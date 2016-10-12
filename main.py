@@ -19,7 +19,6 @@ bot.sendMessage(text)
 '''
 
 
-
 bot = telepot.Bot(TOKEN)
 bot.message_loop(handle)
 print ('Listening ...')
@@ -81,5 +80,20 @@ while 1:
             'type': 'bot_command',
             'length': 5}],
 'text': '/help'}
+
+{'chat': {'first_name': 'Victor',
+          'id': 293927703,
+          'type': 'private',
+          'last_name': 'Panunzio'},
+ 'text': '/echo hola',
+ 'date': 1475770715,
+ 'from': {'first_name': 'Victor',
+          'id': 293927703,
+          'last_name': 'Panunzio'},
+ 'message_id': 100,
+ 'entities': [{'length': 5,
+               'type': 'bot_command',
+               'offset': 0}]
+}
 
           '''
