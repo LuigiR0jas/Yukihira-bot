@@ -1,0 +1,13 @@
+Registro de la Reunión:
+Presentes: Ing. Rainier Araujo, Luigi Rojas(Desarrollador, Arquitecto), Victor Panunzio(Arquitecto, Documentista), Carlos Hernández(Desarrollador, Documentista).
+
+Tema(s) Tratado(s):
+Almacenamiento de las recomendaciones de recetas en una misma tabla. Creacion de nueva tabla de relación
+dishes y users para manejar distintos restaurantes. Hacer un campo array o JSON para las categorías favoritas de
+del usuario.
+
+Para prox. semana:
+
+1. Diagrama Entidad Relación final. (Luigi)
+2. Nomenclatura de los comandos del bot (diagrama de interacción) (Victor)
+3. Diagrama de casos de uso UML. (Carlos)

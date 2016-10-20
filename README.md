@@ -1,2 +1,2 @@
 # Yukihira-bot
-Python written Telegram Bot with AI features.
+Telegram Bot with AI features, aimed to manage new menu plates recommendations and delivery orders. Wrote on Python with Telepot, Telegram Bot API oriented Python framework. 
