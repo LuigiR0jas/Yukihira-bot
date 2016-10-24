@@ -13,11 +13,11 @@ def handle(msg):
     date = str(msg['date'])
     print('·' + firstname + ' (from ' + type + ' chat), at time ' + date + ', says:\n' + text)
     print(msg)
+
 '''
 if msg['entities'] && text == "/echo":
 bot.sendMessage(text)
 '''
-
 
 bot = telepot.Bot(TOKEN)
 bot.message_loop(handle)
