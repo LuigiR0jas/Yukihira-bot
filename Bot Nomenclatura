@@ -1,0 +1,147 @@
+Help { Bot: *shows*
+/NewRestaurant --- Creates a new Restaurant
+/ChangeChef --- Manage the chef of your restaurant
+/RestDescription --- Set a description for your restaurant
+/EditMenu --- Create or update your restaurant’s menu
+/EditRecipe --- Creates or edit a recipe for your menu
+/DishDescription --- Set a description for your dish
+Help { Bot: *shows*
+/NewRestaurant --- Creates a new Restaurant
+/ChangeChef --- Manage the chef of your restaurant
+/RestDescription --- Set a description for your restaurant
+/EditMenu --- Create or update your restaurant’s menu
+/EditRecipe --- Creates or edit a recipe for your menu
+/DishDescription --- Set a description for your dish
+/NewOrder --- Order the dish you want from any of the available restaurants
+}
+
+/Start {
+Bot: “Welcome my name is YukihiraBot. What can I do for you?
+If you want to create a new restaurant you can do it typing the /NewRestaurant
+command. If you want to make an order, please type /NewOrder If you want
+some more information use the /help command”
+}
+
+/NewRestaurant 	{
+Bot: “What’s the name of your restaurant?”
+User: *types the restaurant’s name *
+Bot: “Ok, choose the restaurant’s speciality” 	(KEYBOARD)
+•	Seafood
+•	Grill/Stakehouse
+•	Fast food
+•	Vegetarian
+•	International :
+o	Italian
+o	Chinese
+o	Mexican
+•	Other
+User: *chooses the restaurant’s category*
+Owner: user_name (default)
+Chef: user_name (default)
+Bot: “Congratulation (user_name), you are the new Owner and main Chef of
+(restaurant_name). If you want to create the menu for this your restaurant use
+the /EditMenu command, and if you are not the Chef of the restaurant type
+/ChangeChef to assign a new one”	}
+
+/ChangeChef {
+Bot: Select the restaurant of the chef you want to change
+User:  *selects the restaurant*
+Bot: The current chef of (restaurant_name) is (chef_name), write the username
+your new chef
+User:  *types chef’s username*
+Bot: The new chef of (restaurant_name) is (chef_name).
+}
+
+/RestDescription{
+Bot: “Select the restaurant” *shows the user’s restaurant*
+User: *selects*
+Bot: Type your restaurant description (max 400 characters)
+User: *types*
+Bot: “The description of (restaurant_name) has been changed”
+}
+
+/EditMenu{
+Bot: Select the restaurant *shows the user’s restaurants*
+User: *Selects*
+Bot: (if the restaurant doesn’t have a menu) Menu_List:  this restaurant
+doesn´t have menu, create one using add “
+Bot: “Do you want to add or delete a dish?”
+User: *selects*
+ If chooses add	{
+ 	Bot: “Write the new dish’s name”
+  User: *types dish_name*
+  Bot: “You added (dish_name) in the menu, congratulations! If you want to add
+  a new dish type “add” again, if not type “stop”}
+ If chooses delete: {
+  Bot: What dish do you want to delete?
+  User: *types dish_name*
+  Bot: You deleted (dish_name) the menu. If you want to delete another dish,
+  type “delete” again. If not, type “stop”
+}
+
+
+/EditRecipe {
+Bot: Choose the restaurant (shows the user’s restaurants)
+User: *chooses*
+---Bot: (if restaurant doesnt have menu) Menu_list: “this restaurant doesn´t
+have a menu, uses the /EditMenu command to create one”
+Bot: Type the dish’s name
+User: *types*
+Bot: Now, write the ingredients list, type each ingredient one by one
+(eg. Tomato *send* Sugar *send*), when you have finished, type "Done".
+Type an ingredient…
+User: *types ingredient*
+Bot: Specify the unit for that ingredient (piece, ml, pinch, tablespoon, etc)
+User: *types unit*
+Bot: Now, type the quantity of that unit…
+User: *types quantity*
+Bot: Great, now type another ingredient or type “done”
+User: *types ingredient*
+…
+User: Done
+Bot: Ok, you’re almost done, now, type in the dish’s preparation
+User: *types*
+Bot: Thank you, (dish_name)’s recipe has been completely updated	}
+/DishDescription{
+Bot: Choose the restaurant (shows the user’s restaurants)
+User: *chooses*
+Bot: (if restaurant doesn’t have menu)? Menu_list:  this restaurant doesn´t
+have a menu, uses the /edit_menu command to create one
+Bot: Choose the dish
+User: * chooses dish*
+Bot: Tell me what how would you describe (dish_name)?
+User: *types*
+Bot: “Wow, cool”
+}
+
+/NewOrder {
+(if the user already has an orders history, the bot will start with
+a recommendation)
+Bot: So, according to your previous orders, I assume you’re looking for one
+of these categories
+Bot: Please tell me what type of food are you craving? (Keyboard)
+•	Seafood
+•	Grill/Stakehouse
+•	Fast food
+•	Vegetarian
+•	International :
+o	Italian
+o	Chinese
+o	Mexican
+•	Other
+
+User: *chooses*
+Bot: “Ok here’s what I’ve got for you”	*Show restaurants of selected type*
+User: *chooses*
+---Bot: (if restaurant doesn’t have menu) Menu_list:  this restaurant
+doesn´t have a menu 
+---Bot: Great! Here’s the menu for (restaurant_name): show Menu_list
+User: types (dish_name)
+Bot: Anything else? If you do, please tell me, if not tell me “ok, done”
+User: types (dish_name)
+.
+.
+.
+User: Ok, done
+Bot: Alright (user_name), your order is (order_list)
+}
