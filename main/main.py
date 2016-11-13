@@ -3,12 +3,13 @@ import sys
 import time
 import telepot
 import psycopg2
+import config #where passwords and keys are securely stored
 
-TOKEN = '*******************************************';
+TOKEN = config.apiKey
 
 #--------------------------------------------------------Database Connection----------------------------------------------------------
 try:
-    conn = psycopg2.connect("dbname='bot_test' user='luigi' host='localhost' password='****'")
+    conn = psycopg2.connect("dbname='bot_test' user='luigi' host='localhost' password=" + config.DBPass);
     print('Connected\n')
 except Exception as e:
     print('I am unable to connect the database. Error: ' + e + '\n')
