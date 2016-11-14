@@ -5,11 +5,10 @@ import config
 import dbconnection
 import random
 import messageHandling
-import main
 
-def identifyCommand(command, id):
+def identifyCommand(command, id, username, firstname):
     if (command == '/start'):
-        main.sendMessage(id, "I'm currently under development, please be patient! Although I'm adding you to my database ;)")
+        messageHandling.sendMessage(id, "I'm currently under development, please be patient! Although I'm adding you to my database ;)")
         clientID = 0
         db = dbconnection.connect()
         conn = dbconnection.conn
@@ -39,5 +38,8 @@ def identifyCommand(command, id):
             conn.commit()
             print('User ' + firstname + '(ID: ' + str(id) + ', username: ' + username + ')' + ' is new, therefore has been added to the database')
 
+    elif (command == '/help'):
+        messageHandling.sendMessage(id, '/help: shows this message \nMore comming soon!')
+
     else:
-        main.sendMessage(id, "I'm currently under development, please be patient!")
+        messageHandling.sendMessage(id, "If you need help, send /help")
