@@ -1,4 +1,4 @@
-#-----Dictionary API Responses examples----
+#-----------------------------------Dictionary API Responses examples-----------------------------------------------
 
 #Mensaje privado comando de bot:
 {'text': '/main',
