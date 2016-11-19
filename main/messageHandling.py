@@ -2,16 +2,16 @@
 import sys
 import time
 import telepot
-import config #where passwords and keys are securely stored
+import config
 import dbconnection
 import random
 import commands
 theBot = False
 
+#Function to handle the bot object from main.py
 def botHolder(bot):
     global theBot
     theBot = bot
-
 
 def handle(msg):
     text = msg['text']
@@ -36,7 +36,7 @@ def analize(msg, text, id, username, firstname):
         print('It\'s a command, and it says: ' + command + '\n')
         commands.identifyCommand(command, id, username, firstname)
     else:
-        theBot.sendMessage(id, 'I can only understand you via commands. If you need help, send /help. It was nothing!')    
+        theBot.sendMessage(id, 'I can only understand you via commands. If you need help, send /help. It was nothing!')
 
 def sendMessage(id, text):
     theBot.sendMessage(id, text)
