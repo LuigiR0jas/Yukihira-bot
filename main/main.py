@@ -1,4 +1,4 @@
-#@YukihiraBot v0.0.4
+#@YukihiraBot v0.0.5
 import sys
 import time
 import telepot
@@ -12,7 +12,7 @@ TOKEN = config.apiKey
 bot = telepot.Bot(TOKEN)
 bot.message_loop(messageHandling.handle)
 messageHandling.botHolder(bot)
-print ('*beep* *blop* YukihiraBot v0.0.4 started, listening to new messages ...')
+print ('*beep* *blop* YukihiraBot v0.0.5 started, listening to new messages ...')
 
 #This is to keep the program running.
 while 1:
