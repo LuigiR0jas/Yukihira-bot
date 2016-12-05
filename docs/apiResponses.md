@@ -54,17 +54,4 @@
             'length': 5}],
 'text': '/help'}
 
-{'chat': {'first_name': 'Victor',
-          'id': 999999999,
-          'type': 'private',
-          'last_name': 'Panunzio'},
- 'text': '/echo hola',
- 'date': 1475770715,
- 'from': {'first_name': 'Victor',
-          'id': 999999999,
-          'last_name': 'Panunzio'},
- 'message_id': 100,
- 'entities': [{'length': 5,
-               'type': 'bot_command',
-               'offset': 0}]
 }

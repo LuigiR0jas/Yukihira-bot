@@ -19,7 +19,7 @@ def getUserState(id):
     data0 = [id]
     cursor.execute(query0, data0)
     conn.commit()
-    records = cursor.fetchall()
+    records = cursor.fetchall() ## es un 'arreglo'
     if (len(records) == 0):
         return 'null'
     else:
@@ -121,12 +121,12 @@ def help(id):
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
         messageHandling.sendMessage(id, "What’s the name of your restaurant?")
-        saveUserState(id, 11)
+        saveUserState(id, 11) # guarda el estado en la base de datos para saber en que comando y altura esta
     if (state == 11):
         global restaurantName
-        restaurantName = text
+        restaurantName = text #Revisar que el restaurante no esta inscrito en la db.
         messageHandling.sendMessage(id, "Ok, type the restaurant's specialty");
-        saveUserState(id, 12)
+        saveUserState(id, 12) #Buscar como enviar estos datos al teclado
         messageHandling.sendMessage(id, "1. Seafood \n2.Grill/Steakhouse \n3.Fastfood \n4.Vegetarian \n5.International \n6.Italian \n7.Chinese \n8.Mexican\n9.Other");
     if (state == 12):
         global restaurantCategory
@@ -135,7 +135,7 @@ def NewRestaurant(state, id, username, firstname, type, text):
         conn = dbconnection.conn
         cursor = conn.cursor()
         query0 = "INSERT INTO chef (user_id, chef_id) VALUES (%s, %s)"
-        data0 = (id, id)
+        data0 = (id, id) ##pyton es gay y prefiere string buscar diccionrio tupla lista
         query1 = "INSERT INTO owner (user_id, owner_id) VALUES (%s, %s)"
         data1 = (id, id)
         query2 = "INSERT INTO restaurant (chef_id, user_id, owner_id, restaurant_demand, restaurant_name, restaurant_description, restaurant_address, restaurant_category) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
