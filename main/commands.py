@@ -10,6 +10,7 @@ from telepot.delegate import pave_event_space, per_chat_id, create_open
 TOKEN = config.apiKey
 restaurantName = "null"
 restaurantCategory = "null"
+restaurantDescription = "null"
 
 def identifyCommandByState(state):
     if (state >= 10 and state < 20):
@@ -126,17 +127,25 @@ def NewRestaurant(state, id, username, firstname, type, text):
 
 def ChangeChef(state, id, username, firstname, type):
     if (state == 0):
-        messageHandling.sendMessage(id, "You're inside ChangeChef function, on state 20, please send me another message to get out of here")
-        dbconnection.saveUserState(id, 21)
-    if (state == 21):
-        messageHandling.sendMessage(id, "You're inside ChangeChef  function, on state 21. Another one and you'll be free!")
-        dbconnection.saveUserState(id, 22)
-    if (state == 22):
-        messageHandling.sendMessage(id, "hahaha you're now trapped in ChangeChef function, on state 22! No matter what you do, you can't leave this place")
+        restaurants = getUserRestaurant(id)
+        if(restaurants == "null"):
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
+            dbconnection.saveUserState(id,0)
+        else:
+            messageHandling.sendMessage(id, "Select the restaurant of the chef you want to change" + restaurants)
+            dbconnection.saveUserState(id,21)
+            if (state == 21):
+                global restaurantName = text
+                db = dbconnection.connect()
+                conn = dbconnection.conn
+                cursor = conn.cursor()
+                query = ""
+                messageHandling.sendMessage(id, "You're inside ChangeChef  function, on state 21. Another one and you'll be free!")
+                dbconnection.saveUserState(id, 22)
+            if (state == 22):
+                messageHandling.sendMessage(id, "hahaha you're now trapped in ChangeChef function, on state 22! No matter what you do, you can't leave this place")
 
-    # db = dbconnection.connect()
-    # conn = dbconnection.conn
-    # cursor = conn.cursor()
+
     # query0 = "SELECT restaurant_name FROM restaurant WHERE owner_id = %s"
     # query1 = "SELECT chef_id FROM restaurant WHERE owner_id = %s"
     # data0 = [id]
@@ -161,22 +170,33 @@ def ChangeChef(state, id, username, firstname, type):
     # conn.commit()
     # messageHandling.sendMessage(id, 'The new chef of ' + restaurantName + ' is ' + NewChefID)
 
-def RestDescription(state, id, username, firstname, type):
+def RestDescription(state, id, username, firstname, type, text):
     if (state == 0):
-        messageHandling.sendMessage(id, "You're inside RestDescription  function, on state 30, please send me another message to get out of here")
-        dbconnection.saveUserState(id, 31)
-    if (state == 31):
-        messageHandling.sendMessage(id, "You're inside RestDescription function, on state 31. Another one and you'll be free!")
-        dbconnection.saveUserState(id, 32)
-    if (state == 32):
-        messageHandling.sendMessage(id, "hahaha you're now trapped in RestDescription  function, on state 32! No matter what you do, you can't leave this place")
+        restaurants = getUserRestaurant(id)
+        if(restaurants == "null"):
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
+            dbconnection.saveUserState(id,0)
+        else:
+            messageHandling.sendMessage(id, "Select the restaurant add a description" + restaurants)
+            dbconnection.saveUserState(id,31)
+            if (state == 31):
+                global restaurantName
+                restaurant = text
+                messageHandling.sendMessage(id, "Type your restaurant description (max 400 characters)")
+                dbconnection.saveUserState(id,32)
+            if (state == 32):
+                global restaurantDescription
+                restaurantDescription = text
+                db = dbconnection.connect()
+                conn = dbconnection.conn
+                cursor = conn.cursor()
+                query = "UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s"
+                data = (restaurantDescription, restaurantName)
+                cursor.execute(query, data)
+                conn.commit()
+                messageHandling.sendMessage(id, "The description of" + restaurantName + "has been changed")
+                dbconnection.saveUserState(id, 0)
 
-    # messageHandling.sendMessage(id,'Type your restaurant description (max 400 characters)')
-    # #User sends description
-    # restaurantDescription = msg.txt
-    # db = dbconnection.connect()
-    # conn = dbconnection.conn
-    # cursor = conn.cursor()
     # query0 = "UPDATE restaurant (restaurant_description) VALUES (%s) WHERE owner_id = %s"
     # data0 = (restaurantDescription, id)
     # cursor.execute(query0, data0)
@@ -185,13 +205,28 @@ def RestDescription(state, id, username, firstname, type):
 
 def EditMenu(state, id, username, firstname, type):
     if (state == 0):
-        messageHandling.sendMessage(id, "You're inside EditMenu function, on state 40, please send me another message to get out of here")
-        dbconnection.saveUserState(id, 41)
-    if (state == 41):
-        messageHandling.sendMessage(id, "You're inside EditMenu function, on state 41. Another one and you'll be free!")
-        dbconnection.saveUserState(id, 42)
-    if (state == 42):
-        messageHandling.sendMessage(id, "hahaha you're now trapped in EditMenu function, on state 42! No matter what you do, you can't leave this place")
+        restaurants = getUserRestaurant(id)
+        if(restaurants == "null"):
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
+            dbconnection.saveUserState(id,0)
+        else:
+            messageHandling.sendMessage(id, "Select the restaurant add a Menu" + restaurants)
+            dbconnection.saveUserState(id,41)
+            if (state == 41):
+                global restaurantName
+                restaurant = text
+                db = dbconnection.connect()
+                conn = dbconnection.conn
+                cursor = conn.cursor()
+                query = "SELECT FROM   WHERE restaurant_name = %s"
+                data = (restaurantDescription, restaurantName)
+                cursor.execute(query, data)
+                conn.commit()
+
+                messageHandling.sendMessage(id, "You're inside EditMenu function, on state 41. Another one and you'll be free!")
+                dbconnection.saveUserState(id, 42)
+            if (state == 42):
+                messageHandling.sendMessage(id, "hahaha you're now trapped in EditMenu function, on state 42! No matter what you do, you can't leave this place")
 
 
 def EditRecipe(state, id, username, firstname, type):

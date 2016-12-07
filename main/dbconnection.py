@@ -35,12 +35,13 @@ def saveUserState(id, state):
 def getUserRestaurant(id):
     connect()
     cursor = conn.cursor()
-    query0 = "SELECT * FROM restaurant WHERE owner_id = %s"
-    data0 = [id]
-    cursor.execute(query0, data0)
+    query = "SELECT * FROM restaurant WHERE owner_id = %s"
+    data = [id]
+    cursor.execute(query, data)
     conn.commit()
-    records = cursor.fetchall()
-    if (len(records) == 0):
+    restaurants = cursor.fetchall()
+    if (len(restaurants) == 0):
         return 'null'
     else:
-        return records[0]
+        print(restaurants)
+        return restaurants[0]
