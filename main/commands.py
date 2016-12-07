@@ -135,7 +135,8 @@ def ChangeChef(state, id, username, firstname, type):
             messageHandling.sendMessage(id, "Select the restaurant of the chef you want to change" + restaurants)
             dbconnection.saveUserState(id,21)
             if (state == 21):
-                global restaurantName = text
+                global restaurantName
+                restaurantName = text
                 db = dbconnection.connect()
                 conn = dbconnection.conn
                 cursor = conn.cursor()
@@ -172,7 +173,7 @@ def ChangeChef(state, id, username, firstname, type):
 
 def RestDescription(state, id, username, firstname, type, text):
     if (state == 0):
-        restaurants = getUserRestaurant(id)
+        restaurants = executeQuery("SELECT * FROM restaurant WHERE owner_id = %s", [id], True)
         if(restaurants == "null"):
             messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
             dbconnection.saveUserState(id,0)
@@ -187,13 +188,7 @@ def RestDescription(state, id, username, firstname, type, text):
             if (state == 32):
                 global restaurantDescription
                 restaurantDescription = text
-                db = dbconnection.connect()
-                conn = dbconnection.conn
-                cursor = conn.cursor()
-                query = "UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s"
-                data = (restaurantDescription, restaurantName)
-                cursor.execute(query, data)
-                conn.commit()
+                executeQuery("UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s", [restaurantDescription, restaurantName], False)
                 messageHandling.sendMessage(id, "The description of" + restaurantName + "has been changed")
                 dbconnection.saveUserState(id, 0)
 
@@ -210,7 +205,7 @@ def EditMenu(state, id, username, firstname, type):
             messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
             dbconnection.saveUserState(id,0)
         else:
-            messageHandling.sendMessage(id, "Select the restaurant add a Menu" + restaurants)
+            messageHandling.sendMessage(id, "Select the restaurant to add a Menu" + restaurants)
             dbconnection.saveUserState(id,41)
             if (state == 41):
                 global restaurantName
@@ -218,7 +213,10 @@ def EditMenu(state, id, username, firstname, type):
                 db = dbconnection.connect()
                 conn = dbconnection.conn
                 cursor = conn.cursor()
-                query = "SELECT FROM   WHERE restaurant_name = %s"
+
+                query0 = "SELECT Restaurant_ID FROM user INNER JOIN owner WHERE user.user_id = "
+                data0 = (restaurantName, id)
+                query1 = "SELECT FROM   WHERE restaurant_name = %s"
                 data = (restaurantDescription, restaurantName)
                 cursor.execute(query, data)
                 conn.commit()
