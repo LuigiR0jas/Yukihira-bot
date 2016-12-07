@@ -97,14 +97,19 @@ def help(id):
 
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
+        restaurants = dbconnection.getUserRestaurant(id)
         messageHandling.sendMessage(id, "What’s the name of your restaurant?")
         dbconnection.saveUserState(id, 11) # guarda el estado en la base de datos para saber en que comando y altura esta
     if (state == 11):
         global restaurantName
-        restaurantName = text #Revisar que el restaurante no esta inscrito en la db.
-        messageHandling.sendMessage(id, "Ok, type the restaurant's specialty");
-        dbconnection.saveUserState(id, 12) #Buscar como enviar estos datos al teclado
-        messageHandling.sendMessage(id, "1. Seafood \n2.Grill/Steakhouse \n3.Fastfood \n4.Vegetarian \n5.International \n6.Italian \n7.Chinese \n8.Mexican\n9.Other");
+        restaurantName = text
+        dbrestaurantName = dbconnection.executeQuery("SELECT * FROM restaurant WHERE restaurant_name = %s", restaurantName, True)
+        if (dbrestaurantName != 'null'):
+            messageHandling.sendMessage(id, "Ok, type the restaurant's specialty");
+            dbconnection.saveUserState(id, 12) #Buscar como enviar estos datos al teclado
+            messageHandling.sendMessage(id, "1. Seafood \n2.Grill/Steakhouse \n3.Fastfood \n4.Vegetarian \n5.International \n6.Italian \n7.Chinese \n8.Mexican\n9.Other");
+        else:
+            
     if (state == 12):
         global restaurantCategory
         restaurantCategory = text
