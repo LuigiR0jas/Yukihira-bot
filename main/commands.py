@@ -11,29 +11,6 @@ TOKEN = config.apiKey
 restaurantName = "null"
 restaurantCategory = "null"
 
-def getUserState(id):
-    db = dbconnection.connect()
-    conn = dbconnection.conn
-    cursor = conn.cursor()
-    query0 = "SELECT state FROM users WHERE user_id = %s"
-    data0 = [id]
-    cursor.execute(query0, data0)
-    conn.commit()
-    records = cursor.fetchall() ## es un 'arreglo'
-    if (len(records) == 0):
-        return 'null'
-    else:
-        return records[0]
-
-def saveUserState(id, state):
-    db = dbconnection.connect()
-    conn = dbconnection.conn
-    cursor = conn.cursor()
-    query0 = "UPDATE users SET state= %s WHERE user_id = %s"
-    data0 = (state,id)
-    cursor.execute(query0, data0)
-    conn.commit()
-
 def identifyCommandByState(state):
     if (state >= 10 and state < 20):
         print('Identifying command, state is ' + str(state))
@@ -121,12 +98,12 @@ def help(id):
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
         messageHandling.sendMessage(id, "What’s the name of your restaurant?")
-        saveUserState(id, 11) # guarda el estado en la base de datos para saber en que comando y altura esta
+        dbconnection.saveUserState(id, 11) # guarda el estado en la base de datos para saber en que comando y altura esta
     if (state == 11):
         global restaurantName
         restaurantName = text #Revisar que el restaurante no esta inscrito en la db.
         messageHandling.sendMessage(id, "Ok, type the restaurant's specialty");
-        saveUserState(id, 12) #Buscar como enviar estos datos al teclado
+        dbconnection.saveUserState(id, 12) #Buscar como enviar estos datos al teclado
         messageHandling.sendMessage(id, "1. Seafood \n2.Grill/Steakhouse \n3.Fastfood \n4.Vegetarian \n5.International \n6.Italian \n7.Chinese \n8.Mexican\n9.Other");
     if (state == 12):
         global restaurantCategory
@@ -145,15 +122,15 @@ def NewRestaurant(state, id, username, firstname, type, text):
         cursor.execute(query2, data2)
         conn.commit()
         messageHandling.sendMessage(id, 'Congratulations ' + username + ', you are the new owner and main chef of ' + restaurantName + '. If you want to create the menu for your restaurant, use the /EditMenu command, and if you are not the Chef of the restaurant type /ChangeChef to assign a new one')
-        saveUserState(id, 0)
+        dbconnection.saveUserState(id, 0)
 
 def ChangeChef(state, id, username, firstname, type):
     if (state == 0):
         messageHandling.sendMessage(id, "You're inside ChangeChef function, on state 20, please send me another message to get out of here")
-        saveUserState(id, 21)
+        dbconnection.saveUserState(id, 21)
     if (state == 21):
         messageHandling.sendMessage(id, "You're inside ChangeChef  function, on state 21. Another one and you'll be free!")
-        saveUserState(id, 22)
+        dbconnection.saveUserState(id, 22)
     if (state == 22):
         messageHandling.sendMessage(id, "hahaha you're now trapped in ChangeChef function, on state 22! No matter what you do, you can't leave this place")
 
@@ -187,10 +164,10 @@ def ChangeChef(state, id, username, firstname, type):
 def RestDescription(state, id, username, firstname, type):
     if (state == 0):
         messageHandling.sendMessage(id, "You're inside RestDescription  function, on state 30, please send me another message to get out of here")
-        saveUserState(id, 31)
+        dbconnection.saveUserState(id, 31)
     if (state == 31):
         messageHandling.sendMessage(id, "You're inside RestDescription function, on state 31. Another one and you'll be free!")
-        saveUserState(id, 32)
+        dbconnection.saveUserState(id, 32)
     if (state == 32):
         messageHandling.sendMessage(id, "hahaha you're now trapped in RestDescription  function, on state 32! No matter what you do, you can't leave this place")
 
@@ -209,10 +186,10 @@ def RestDescription(state, id, username, firstname, type):
 def EditMenu(state, id, username, firstname, type):
     if (state == 0):
         messageHandling.sendMessage(id, "You're inside EditMenu function, on state 40, please send me another message to get out of here")
-        saveUserState(id, 41)
+        dbconnection.saveUserState(id, 41)
     if (state == 41):
         messageHandling.sendMessage(id, "You're inside EditMenu function, on state 41. Another one and you'll be free!")
-        saveUserState(id, 42)
+        dbconnection.saveUserState(id, 42)
     if (state == 42):
         messageHandling.sendMessage(id, "hahaha you're now trapped in EditMenu function, on state 42! No matter what you do, you can't leave this place")
 
@@ -220,10 +197,10 @@ def EditMenu(state, id, username, firstname, type):
 def EditRecipe(state, id, username, firstname, type):
     if (state == 0):
         messageHandling.sendMessage(id, "You're inside EditRecipe function, on state 50, please send me another message to get out of here")
-        saveUserState(id, 51)
+        dbconnection.saveUserState(id, 51)
     if (state == 51):
         messageHandling.sendMessage(id, "You're inside EditRecipe function, on state 51. Another one and you'll be free!")
-        saveUserState(id, 52)
+        dbconnection.saveUserState(id, 52)
     if (state == 52):
         messageHandling.sendMessage(id, "hahaha you're now trapped in EditRecipe function, on state 52! No matter what you do, you can't leave this place")
 
@@ -231,10 +208,10 @@ def EditRecipe(state, id, username, firstname, type):
 def DishDescription(state, id, username, firstname, type):
     if (state == 0):
         messageHandling.sendMessage(id, "You're inside DishDescription function, on state 60, please send me another message to get out of here")
-        saveUserState(id, 61)
+        dbconnection.saveUserState(id, 61)
     if (state == 61):
         messageHandling.sendMessage(id, "You're inside DishDescription function, on state 61. Another one and you'll be free!")
-        saveUserState(id, 62)
+        dbconnection.saveUserState(id, 62)
     if (state == 62):
         messageHandling.sendMessage(id, "hahaha you're now trapped in DishDescription function, on state 62! No matter what you do, you can't leave this place")
 
@@ -242,13 +219,13 @@ def DishDescription(state, id, username, firstname, type):
 def NewOrder(state, id, username, firstname, type):
     if (state == 0):
         messageHandling.sendMessage(id, "You're inside NewOrder function, on state 70, please send me another message to get out of here")
-        saveUserState(id, 71)
+        dbconnection.saveUserState(id, 71)
     if (state == 71):
         messageHandling.sendMessage(id, "You're inside NewOrder function, on state 71. Another one and you'll be free!")
-        saveUserState(id, 72)
+        dbconnection.saveUserState(id, 72)
     if (state == 72):
         messageHandling.sendMessage(id, "hahaha you're now trapped in NewOrder function, on state 72! No matter what you do, you can't leave this place")
 
 def cancel(id):
-    saveUserState(id, 0)
+    dbconnection.saveUserState(id, 0)
     messageHandling.sendMessage(id, "Oww :C. You found my weakness! Very well, your state is now 0 again")

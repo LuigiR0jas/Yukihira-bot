@@ -29,23 +29,23 @@ def handle(msg):
     analisys = analize(msg, text, id, type)
 
     if (isinstance(analisys, str)):
-        state = commands.getUserState(id)
+        state = dbconnection.getUserState(id)
         commands.identifyCommand(analisys, state[0], id, username, firstname, type, text)
     elif(analisys == 1):
-        state = commands.getUserState(id)
+        state = dbconnection.getUserState(id)
         # print("In message hanlder: " + str(state[0]))
         command = commands.identifyCommandByState(state[0])
         # print('Again in message handler: ' + command)
         commands.identifyCommand(command, state[0], id, username, firstname, type, text)
     elif(analisys == 0):
-        state = commands.getUserState(id)
+        state = dbconnection.getUserState(id)
         theBot.sendMessage(id, 'I can only understand you via commands. If you need help, send /help. It was nothing!')
         # print('type is ' + type + ' and state is ' + str(state[0]) + '. Analisys is: ' )
         # print(analisys)
 
 
 def analize(msg, text, id, type):
-    state = commands.getUserState(id)
+    state = dbconnection.getUserState(id)
     if('entities' in msg and state[0] == 0):
         textArray = text.split(" ")
         command = textArray[0]
