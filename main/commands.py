@@ -14,6 +14,7 @@ restaurantAddress = "null"
 userID = "null"
 restID = "null"
 dishPrice = "null"
+dishesC = "null"
 
 
 # def addOrDelete(responds):
@@ -134,7 +135,7 @@ def start(id, username, firstname):
         print('User ' + firstname + '(ID: ' + str(id) + ', username: ' + username + ')' + ' is new, therefore has been added to the database')
 
 def help(id):
-    messageHandling.sendMessage(id, 'Command list:\n /newrestaurant --- Creates a new Restaurant \n/changechef --- Manage the chef of your restaurant \n/restdescription --- Set a description for your restaurant \n/editmenu --- Create or update your restaurant’s menu \n/editrecipe --- Creates or edit a recipe for your menu \n/dishdescription --- Set a description for your dish\n/managemenu --- Choose if dish appears in menu\n /neworder --- Order the dish you want from any of the available restaurants')
+    messageHandling.sendMessage(id, 'Command list:\n /newrestaurant --- Creates a new Restaurant \n/changechef --- Manage the chef of your restaurant \n/restdescription --- Set a description for your restaurant \n/editmenu --- Create or update your restaurant’s menu \n/editrecipe --- Creates or edit a recipe for your menu \n/dishdescription --- Set a description for your dish\n/managemenu --- Choose if dish appears in menu\n /neworder --- Order the dish you want from any of the available restaurants\n /recommendation -- generates the recomendation to the chef')
 
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
@@ -362,13 +363,42 @@ def managemenu(state, id, username, firstname, type, text):
 
 def NewOrder(state, id, username, firstname, type, text):
     if (state == 0):
-        messageHandling.sendMessage(id, "You're inside NewOrder function, on state 70, please send me another message to get out of here")
+        restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant ", [], True)
+        arr = objectList(restaurants)
+        messageHandling.sendKeyboard(id, "Select the restaurant to do an order", {"keyboard": [arr], "one_time_keyboard":True})
         dbconnection.saveUserState(id, 71)
     if (state == 71):
-        messageHandling.sendMessage(id, "You're inside NewOrder function, on state 71. Another one and you'll be free!")
-        dbconnection.saveUserState(id, 72)
+        global restaurantName
+        restaurantName = text
+        global restID
+        restID = dbconnection.executeQuery("SELECT restaurant_id FROM restaurant WHERE restaurant_name= %s", [restaurantName], True)             #revisar
+        print(restID)
+        global dishesC
+        dishesC = dbconnection.executeQuery("SELECT dish_name FROM dishes WHERE restaurant_id= %s", [restID[0]], True)
+        if(dishes == "null"):
+            messageHandling.sendMessage(id, "The restaurant "+ restaurantName + " doesn't have a Menu yet")
+            dbconnection.saveUserState(id, 0)
+        else:
+            dbconnection.saveUserState(id, 72)
     if (state == 72):
-        messageHandling.sendMessage(id, "hahaha you're now trapped in NewOrder function, on state 72! No matter what you do, you can't leave this place")
+        arr = objectList(dishesC)
+        messageHandling.sendKeyboard(id, "Choose the dish you want to order", {"keyboard": [arr], "one_time_keyboard":True})
+        global dishName
+        dishName = text
+        dishDemand = dbconnection.executeQuery("SELECT dish_demand FROM dishes WHERE dish_name= %s AND restaurant_id= %s", [ dishName, restID[0]], False)
+        dishDemand1 = objectList(dishDemand)
+        dishDemand1[0] = dishDemand1[0] + 1
+        dbconnection.executeQuery("UPDATE dishes SET dish_demand= %s WHERE dish_name= %s AND restaurant_id= %s", [dishDemand1[0], dishName, restID[0]], False)
+        messageHandling.sendKeyboard(id, "If you want other dish press 'other dish' if you don't want order more press 'Finish order'", {"keyboard": [["Other dish", "Finish order"]], "one_time_keyboard":True})
+        dbconnection.saveUserState(id, 73)
+    if(state == 74):
+        dishOrder = text
+        if(dishOrder == "Other dish"):
+            messageHandling.sendMessage(id, dishName + " was other")
+            dbconnection.saveUserState(id, 72)
+        else:
+            messageHandling.sendMessage(id, "you finished your order")
+            dbconnection.saveUserState(id, 0)
 
 def recommendation(state, id, username, firstname, text):
     if (state == 0):
