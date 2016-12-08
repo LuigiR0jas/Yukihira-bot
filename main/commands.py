@@ -12,21 +12,17 @@ restaurantCategory = "null"
 restaurantDescription = "null"
 restaurantAddress = "null"
 userID = "null"
+chefID = "null"
+ownerID = "null"
 restID = "null"
 dishPrice = "null"
-dishesC = "null"
+dishName = "null"
+dish = "null"
+quantity = "null"
+ingredientName = "null"
+ingredient = "null"
+unit = "null"
 
-
-# def addOrDelete(responds):
-#     if(responds == "add"):
-#         messageHandling.sendMessage(id,"Write the new dish's name")
-#         dishName = text
-#         executeQuery("INSERT INTO dishes (user_id, user_name, user_firstname)", [text], False)
-#         return responds = "If you want to add or delete other dish use again 'add' or 'delete'"
-#     elif(responds == "delete"):
-#         messageHandling.sendMessage(id,"what dish do you want to delete?")
-#         executeQuery("DELETE ", [text], False)
-#         return responds = "If you want to add or delete other dish use again 'add' or 'delete'"
 
 def objectList(listR):
     arr = []
@@ -66,6 +62,7 @@ def identifyCommandByState(state):
     elif (state >= 100 and state < 110):
         print('Identifying command, state is ' + str(state))
         return "/managemenu"
+
 
 
 def identifyCommand(command, state, id, username, firstname, type, text):
@@ -272,15 +269,83 @@ def EditMenu(state, id, username, firstname, type, text):
         dbconnection.saveUserState(id, 41)
         identifyCommand("/editmenu", 41, id, username, firstname, type, restaurantName)
 
-def EditRecipe(state, id, username, firstname, type):
+def EditRecipe(state, id, username, firstname, type, text):
     if (state == 0):
-        messageHandling.sendMessage(id, "You're inside EditRecipe function, on state 50, please send me another message to get out of here")
-        dbconnection.saveUserState(id, 51)
+        restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
+        if(restaurants == "null"):
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
+            dbconnection.saveUserState(id,0)
+        else:
+            arr = objectList(restaurants)
+            messageHandling.sendKeyboard(id, "Select the restaurant to add a Menu", {"keyboard": [arr], "one_time_keyboard":True})
+            dbconnection.saveUserState(id,51)
     if (state == 51):
-        messageHandling.sendMessage(id, "You're inside EditRecipe function, on state 51. Another one and you'll be free!")
-        dbconnection.saveUserState(id, 52)
+        global restaurantName
+        restaurantName = text
+        global restID
+        restID = dbconnection.executeQuery("SELECT restaurant_id FROM restaurant WHERE restaurant_name= %s", [restaurantName], True)             #revisar
+        print(restID)
+        dishes = dbconnection.executeQuery("SELECT dish_name FROM dishes WHERE restaurant_id= %s", [restID[0]], True)
+        lel = dbconnection.executeQuery("SELECT chef_id FROM restaurant WHERE restaurant_id= %s", [restID[0]], True)
+        lol = dbconnection.executeQuery("SELECT owner_id FROM restaurant WHERE restaurant_id= %s", [restID[0]], True)
+        global chefID
+        chefID = objectList(lel)
+        global ownerID
+        ownerID = objectList(lol)
+        arr = objectList(dishes)
+        if(dishes == "null"):
+            messageHandling.sendKeyboard(id, "The restaurant "+ restaurantName + " dosen't have a Menu, to create it send 'add'", {"keyboard": [["Add"], ["Cancel"]], "one_time_keyboard":True})
+            dbconnection.saveUserState(id, 52)
+        else:
+            messageHandling.sendKeyboard(id, "Select the dish which recipe you want to change/add.", {"keyboard": [arr], "one_time_keyboard":True})
+            dbconnection.saveUserState(id, 52)
     if (state == 52):
-        messageHandling.sendMessage(id, "hahaha you're now trapped in EditRecipe function, on state 52! No matter what you do, you can't leave this place")
+        global dishName
+        dishName = text
+        dishid = dbconnection.executeQuery("SELECT dish_id FROM dishes WHERE dish_name = %s", [dishName], True)
+        global dish
+        dish = objectList(dishid)
+        recipe = dbconnection.executeQuery("SELECT recipe_id FROM recipe WHERE dish_id = %s", [dish[0]], True)
+        if (recipe == 'null'):
+            messageHandling.sendMessage(id, "So, there's no recipe associated with that dish, so you need to create it. Firstly, let's make a list of the ingredients. Type the name of the first ingredient.")
+            dbconnection.saveUserState(id, 53)
+        else:
+            messageHandling.sendKeyboard(id, "There is aleady a recipe started on that dish, so what do you want to do?",  {"keyboard": [["Add ingredient", "Set dish preparation"]], "one_time_keyboard":True})
+            dbconnection.saveUserState(id, 56)
+    if (state == 53):
+        global ingredientName
+        ingredientName = text
+        global ingredient
+        ingredient = dbconnection.executeQuery("SELECT ingredient_id FROM ingredients WHERE ingredient_name = %s", [ingredientName], True)
+        if (ingredient == 'null'):
+            dbconnection.executeQuery("INSERT INTO ingredients(ingredient_name) VALUES(%s)", [ingredientName], False)
+            global ingredient
+            ingredient = dbconnection.executeQuery("SELECT ingredient_id FROM ingredients WHERE ingredient_name = %s", [ingredientName], True)
+        messageHandling.sendMessage(id, "Now type the quantity for that ingredient")
+        dbconnection.saveUserState(id, 54)
+    if (state == 54):
+        global quantity
+        quantity = text
+        messageHandling.sendMessage(id, "Sweet. Now provide a quantity value for that ingredient (g, oz, spoon, etc. But just if it's necessary)")
+        dbconnection.saveUserState(id, 55)
+    if (state == 55):
+        global unit
+        unit = text
+        dbconnection.executeQuery("INSERT INTO recipe(ingredient_id, dish_id, restaurant_id, chef_id, owner_id, quantity, unit) VALUES(%s, %s, %s, %s, %s, %s, %s)", [ingredient[0], dish[0], restID[0],chefID[0], ownerID[0], quantity, unit], False)
+        messageHandling.sendKeyboard(id, "Ingredient for the recipe added! Choose wheter you'd like to add another ingredient or set a dish preparation", {"keyboard": [["Add ingredient", "Set dish preparation"]], "one_time_keyboard":True})
+        dbconnection.saveUserState(id, 56)
+    if (state == 56):
+        if(text == "Add ingredient"):
+            messageHandling.sendMessage(id,"Good. Type the name of the next ingredient")
+            dbconnection.saveUserState(id, 53)
+        elif(text == "Set dish preparation"):
+            messageHandling.sendMessage(id,"Write a brief but fullfiling recipe for your dish, remember it must be clear and detailed enough so other chefs could use it!")
+            dbconnection.saveUserState(id, 57)
+    if (state == 57):
+        dishRecipe = text
+        dbconnection.executeQuery("UPDATE dishes SET dish_preparation= %s WHERE dish_id = %s", [dishRecipe, dish[0]], False)
+        messageHandling.sendMessage(id,"Great!, you created the recipe for that dish.")
+        dbconnection.saveUserState(id, 0)
 
 
 def DishDescription(state, id, username, firstname, type, text):
