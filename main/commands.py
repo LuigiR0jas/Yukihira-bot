@@ -5,13 +5,13 @@ import config
 import dbconnection
 import random
 import messageHandling
-from telepot.delegate import pave_event_space, per_chat_id, create_open
 
 TOKEN = config.apiKey
 restaurantName = "null"
 restaurantCategory = "null"
 restaurantDescription = "null"
 restaurantAddress = "null"
+userID = "null"
 
 # def addOrDelete(responds):
 #     if(responds == "add"):
@@ -74,7 +74,7 @@ def identifyCommand(command, state, id, username, firstname, type, text):
     elif (command == '/restdescription'):
         RestDescription(state, id, username, firstname, type, text)
 
-    elif (command == '/RestAddress'):
+    elif (command == '/restaddress'):
         RestDescription(state, id, username, firstname, type, text)
 
     elif (command == '/editmenu'):
@@ -152,54 +152,54 @@ def NewRestaurant(state, id, username, firstname, type, text):
         messageHandling.sendMessage(id, 'Congratulations ' + username + ', you are the new owner and main chef of ' + restaurantName + '. If you want to create the menu for your restaurant, use the /editmenu command, and if you are not the Chef of the restaurant type /changechef to assign a new one')
         dbconnection.saveUserState(id, 0)
 
-def ChangeChef(state, id, username, firstname, type):
-    print("algo")
-    # if (state == 0):
-    #     restaurants = executeQuery("SELECT * FROM restaurant WHERE owner_id = %s", [id], True)
-    #     if(restaurants == "null"):
-    #         messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
-    #         dbconnection.saveUserState(id,0)
-    #     else:
-    #         messageHandling.sendMessage(id, "Select the restaurant of the chef you want to change" + restaurants)
-    #         dbconnection.saveUserState(id,21)
-    #         if (state == 21):
-    #             global restaurantName
-    #             restaurantName = text
-    #             chef =  executeQuery("SELECT chef_id FROM chef WHERE restaurant_id= %s", [x[0] for x in restaurants], True)
-    #             messageHandling.sendMessage(id, "The current chef of"+ restaurantName +"is"+ chef +", write the username")
-    #             dbconnection.saveUserState(id, 22)
-    #         if (state == 22):
-    #             messageHandling.sendMessage(id, "hahaha you're now trapped in ChangeChef function, on state 22! No matter what you do, you can't leave this place")
+# def ChangeChef(state, id, username, firstname, type, text):
+#     if (state == 0):
+#         restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
+#         if(restaurants == "null"):
+#             messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the command /newrestaurant")
+#             dbconnection.saveUserState(id,0)
+#         else:
+#             arr = restaurantList(restaurants)
+#             messageHandling.sendKeyboard(id, "Select the restaurant which chef you want to change", {"keyboard": [arr], "one_time_keyboard":True})
+#             dbconnection.saveUserState(id,21)
+#     if (state == 21):
+#         global restaurantName
+#         restaurantName = text
+#         chefQuery =  dbconnection.executeQuery("SELECT chef_id FROM restaurant WHERE restaurant_name= %s", [restaurantName], True)
+#         chef = restaurantList(chefQuery)
+#         chefUserID = dbconnection.executeQuery("SELECT user_id FROM chef WHERE chef_id=%s", [chef[0]], True)
+#         global userID
+#         userID = restaurantList(chefUserID)
+#         user = dbconnection.executeQuery("SELECT user_name, user_firstname FROM users WHERE user_id=%s", [userID[0]], True)
+#         userData = restaurantList(user)
+#         if (userData[0] != 'N/A'):
+#             chefName = userData[0]
+#         else:
+#             chefName = userData[1]
+#         messageHandling.sendMessage(id, "The current chef of restaurant "+ restaurantName +" is "+ chefName +", write the username of the new chef. (Please note that, prior to send the username of the chef, he must have a username and have started a conversation with me).")
+#         dbconnection.saveUserState(id, 22)
+#     if (state == 22):
+#         username = text
+#         isChef = dbconnection.executeQuery("SELECT user_id, user_firstname FROM users WHERE user_name= %s", [text], True)
+#         newChef = restaurantList(isChef)
+#         if (isChef == 'null'):
+#             messageHandling.sendMessage(id, "That user is not registered. Please verify that the provided username is correct or that your chef has talked to me prior to doing this process.")
+#         else:
+#             print(newChef[0])
+#             dbconnection.executeQuery("UPDATE restaurant SET user_id= %s WHERE user_id= %s", [newChef[0], userID[0]], False )
+#             dbconnection.executeQuery("UPDATE chef SET user_id= %s WHERE user_id= %s", [newChef[0], userID[0]], False)
+#             if (newChef[1] == 'N/A'):
+#                 chefName = newChef[1]
+#             else:
+#                 chefName = text
+#             messageHandling.sendMessage(id, "Chef changed, the new chef is now " + chefName)
+#             dbconnection.saveUserState(id, 0)
 
-
-    # query0 = "SELECT restaurant_name FROM restaurant WHERE owner_id = %s"
-    # query1 = "SELECT chef_id FROM restaurant WHERE owner_id = %s"
-    # data0 = [id]
-    # data1 = [id]
-    # cursor.execute(query0, data0)
-    # conn.commit()
-    # records = cursor.fetchall()
-    # cursor.execute(query1, data1)
-    # conn.commit()
-    # records1 = cursor.fetchall()
-    # restaurantName = records(0)
-    # currentChefID = records1(0)
-    # messageHandling.sendMessage(id, 'The current chef of ' + restaurantName+ ' is ' + currentChefID +', write the id of your new chef')
-    # #User types chef’s username
-    # newChefID = msg.txt
-    # db = dbconnection.connect()
-    # conn = dbconnection.conn
-    # cursor = conn.cursor()
-    # query0 = "UPDATE restaurant (chef_id) VALUES (%s) WHERE owner_id = %s"
-    # data0 = (newChefID, id)
-    # cursor.execute(query0, data0)
-    # conn.commit()
-    # messageHandling.sendMessage(id, 'The new chef of ' + restaurantName + ' is ' + NewChefID)
 def RestDescription(state, id, username, firstname, type, text):
     if (state == 0):
         restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
         if (restaurants == "null"):
-            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /newrestaurant")
             dbconnection.saveUserState(id,0)
         else:
             arr = restaurantList(restaurants)
@@ -238,12 +238,6 @@ def RestAddress(state, id, username, firstname, type, text):
         dbconnection.executeQuery("UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s", [restaurantAddress, restaurantName], False)
         messageHandling.sendMessage(id, "The description of " + restaurantName + " has been changed")
         dbconnection.saveUserState(id, 0)
-
-    # query0 = "UPDATE restaurant (restaurant_description) VALUES (%s) WHERE owner_id = %s"
-    # data0 = (restaurantDescription, id)
-    # cursor.execute(query0, data0)
-    # conn.commit()
-    # messageHandling.sendMessage(id,'“The description of (restaurant_name) has been changed”')
 
 def EditMenu(state, id, username, firstname, type):
     print("algo")
