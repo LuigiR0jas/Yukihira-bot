@@ -1,0 +1,304 @@
+
+CREATE TABLE public.Users (
+                User_ID INTEGER NOT NULL,
+                User_Name VARCHAR(60) NOT NULL,
+                User_Firstname VARCHAR(60),
+                state INTEGER DEFAULT 0 NOT NULL,
+                CONSTRAINT users_pk PRIMARY KEY (User_ID)
+);
+COMMENT ON COLUMN public.Users.User_Firstname IS 'fi';
+
+
+CREATE SEQUENCE public.client_client_id_seq;
+
+CREATE TABLE public.Client (
+                User_ID INTEGER NOT NULL,
+                Client_ID INTEGER NOT NULL DEFAULT nextval('public.client_client_id_seq'),
+                CONSTRAINT client_pk PRIMARY KEY (User_ID, Client_ID)
+);
+
+
+ALTER SEQUENCE public.client_client_id_seq OWNED BY public.Client.Client_ID;
+
+CREATE SEQUENCE public.history_history_id_seq;
+
+CREATE TABLE public.History (
+                History_ID INTEGER NOT NULL DEFAULT nextval('public.history_history_id_seq'),
+                User_ID INTEGER NOT NULL,
+                Client_ID INTEGER NOT NULL,
+                CONSTRAINT history_pk PRIMARY KEY (History_ID, User_ID, Client_ID)
+);
+
+
+ALTER SEQUENCE public.history_history_id_seq OWNED BY public.History.History_ID;
+
+CREATE SEQUENCE public.preferences_preferences_id_seq;
+
+CREATE TABLE public.Preferences (
+                Preferences_ID INTEGER NOT NULL DEFAULT nextval('public.preferences_preferences_id_seq'),
+                User_ID INTEGER NOT NULL,
+                Client_ID INTEGER NOT NULL,
+                Dish_Preference INTEGER NOT NULL,
+                Dish_Counter INTEGER NOT NULL,
+                CONSTRAINT preferences_pk PRIMARY KEY (Preferences_ID, User_ID, Client_ID)
+);
+
+
+ALTER SEQUENCE public.preferences_preferences_id_seq OWNED BY public.Preferences.Preferences_ID;
+
+CREATE SEQUENCE public.chef_chef_id_seq;
+
+CREATE TABLE public.Chef (
+                User_ID INTEGER NOT NULL,
+                Chef_ID INTEGER NOT NULL DEFAULT nextval('public.chef_chef_id_seq'),
+                CONSTRAINT chef_pk PRIMARY KEY (User_ID, Chef_ID)
+);
+
+
+ALTER SEQUENCE public.chef_chef_id_seq OWNED BY public.Chef.Chef_ID;
+
+CREATE SEQUENCE public.owner_owner_id_seq;
+
+CREATE TABLE public.Owner (
+                User_ID INTEGER NOT NULL,
+                Owner_ID INTEGER NOT NULL DEFAULT nextval('public.owner_owner_id_seq'),
+                CONSTRAINT owner_pk PRIMARY KEY (User_ID, Owner_ID)
+);
+
+
+ALTER SEQUENCE public.owner_owner_id_seq OWNED BY public.Owner.Owner_ID;
+
+CREATE SEQUENCE public.restaurant_restaurant_id_seq_1;
+
+CREATE TABLE public.Restaurant (
+                Restaurant_ID INTEGER NOT NULL DEFAULT nextval('public.restaurant_restaurant_id_seq_1'),
+                Chef_ID INTEGER NOT NULL,
+                User_ID INTEGER NOT NULL,
+                Owner_ID INTEGER NOT NULL,
+                Restaurant_Demand INTEGER DEFAULT 0 NOT NULL,
+                Restaurant_Name VARCHAR(60) NOT NULL,
+                Restaurant_Description VARCHAR(200),
+                Restaurant_Address VARCHAR(60),
+                Restaurant_Category VARCHAR(60) NOT NULL,
+                CONSTRAINT restaurant_pk PRIMARY KEY (Restaurant_ID, Chef_ID, User_ID, Owner_ID)
+);
+
+
+ALTER SEQUENCE public.restaurant_restaurant_id_seq_1 OWNED BY public.Restaurant.Restaurant_ID;
+
+CREATE SEQUENCE public.orders_order_id_seq;
+
+CREATE TABLE public.Orders (
+                Chef_ID INTEGER NOT NULL,
+                Owner_ID INTEGER NOT NULL,
+                History_ID INTEGER NOT NULL,
+                Client_ID INTEGER NOT NULL,
+                Order_ID INTEGER NOT NULL DEFAULT nextval('public.orders_order_id_seq'),
+                Restaurant_ID INTEGER NOT NULL,
+                Order_TotalPrice REAL NOT NULL,
+                Order_Date DATE NOT NULL,
+                CONSTRAINT orders_pk PRIMARY KEY (Chef_ID, Owner_ID, History_ID, Client_ID, Order_ID, Restaurant_ID)
+);
+
+
+ALTER SEQUENCE public.orders_order_id_seq OWNED BY public.Orders.Order_ID;
+
+CREATE SEQUENCE public.ingredients_ingredient_id_seq;
+
+CREATE TABLE public.Ingredients (
+                Ingredient_ID INTEGER NOT NULL DEFAULT nextval('public.ingredients_ingredient_id_seq'),
+                Ingredient_Name VARCHAR(60) NOT NULL,
+                Ingredient_Demand INTEGER NOT NULL,
+                CONSTRAINT ingredients_pk PRIMARY KEY (Ingredient_ID)
+);
+
+
+ALTER SEQUENCE public.ingredients_ingredient_id_seq OWNED BY public.Ingredients.Ingredient_ID;
+
+CREATE SEQUENCE public.dishes_dish_id_seq;
+
+CREATE TABLE public.Dishes (
+                Dish_ID INTEGER NOT NULL DEFAULT nextval('public.dishes_dish_id_seq'),
+                Restaurant_ID INTEGER NOT NULL,
+                Chef_ID INTEGER NOT NULL,
+                Owner_ID INTEGER NOT NULL,
+                On_Menu BOOLEAN DEFAULT FALSE NOT NULL,
+                Dish_Name VARCHAR(60) NOT NULL,
+                Dish_Description VARCHAR(400) NOT NULL,
+                Dish_Category VARCHAR(60) NOT NULL,
+                Dish_Price REAL NOT NULL,
+                Dish_Demand INTEGER NOT NULL,
+                CONSTRAINT dishes_pk PRIMARY KEY (Dish_ID, Restaurant_ID, Chef_ID, Owner_ID)
+);
+
+
+ALTER SEQUENCE public.dishes_dish_id_seq OWNED BY public.Dishes.Dish_ID;
+
+CREATE SEQUENCE public.recipe_recipe_id_seq;
+
+CREATE TABLE public.Recipe (
+                Recipe_ID INTEGER NOT NULL DEFAULT nextval('public.recipe_recipe_id_seq'),
+                Ingredient_ID INTEGER NOT NULL,
+                Dish_ID INTEGER NOT NULL,
+                Restaurant_ID INTEGER NOT NULL,
+                Chef_ID INTEGER NOT NULL,
+                Owner_ID INTEGER NOT NULL,
+                Quantity INTEGER NOT NULL,
+                Unit VARCHAR(10),
+                Recipe_Preparation VARCHAR(5000) NOT NULL,
+                CONSTRAINT recipe_pk PRIMARY KEY (Recipe_ID, Ingredient_ID, Dish_ID, Restaurant_ID, Chef_ID, Owner_ID)
+);
+
+
+ALTER SEQUENCE public.recipe_recipe_id_seq OWNED BY public.Recipe.Recipe_ID;
+
+CREATE SEQUENCE public.order_detail_order_detail_id_seq;
+
+CREATE TABLE public.Order_Detail (
+                History_ID INTEGER NOT NULL,
+                Client_ID INTEGER NOT NULL,
+                Order_ID INTEGER NOT NULL,
+                Order_Detail_ID INTEGER NOT NULL DEFAULT nextval('public.order_detail_order_detail_id_seq'),
+                Recipe_ID INTEGER NOT NULL,
+                Ingredient_ID INTEGER NOT NULL,
+                Restaurant_ID INTEGER NOT NULL,
+                Chef_ID INTEGER NOT NULL,
+                Owner_ID INTEGER NOT NULL,
+                CONSTRAINT order_detail_pk PRIMARY KEY (History_ID, Client_ID, Order_ID, Order_Detail_ID, Recipe_ID, Ingredient_ID, Restaurant_ID, Chef_ID, Owner_ID)
+);
+
+
+ALTER SEQUENCE public.order_detail_order_detail_id_seq OWNED BY public.Order_Detail.Order_Detail_ID;
+
+CREATE SEQUENCE public.extras_detail_extra_id_seq;
+
+CREATE TABLE public.Extras_Detail (
+                History_ID INTEGER NOT NULL,
+                Client_ID INTEGER NOT NULL,
+                Order_ID INTEGER NOT NULL,
+                Order_Detail_ID INTEGER NOT NULL,
+                Dish_ID INTEGER NOT NULL,
+                Restaurant_ID INTEGER NOT NULL,
+                Chef_ID INTEGER NOT NULL,
+                Owner_ID INTEGER NOT NULL,
+                Recipe_ID INTEGER NOT NULL,
+                Ingredient_ID INTEGER NOT NULL,
+                Extra_ID INTEGER NOT NULL DEFAULT nextval('public.extras_detail_extra_id_seq'),
+                Extra_Demand INTEGER NOT NULL,
+                CONSTRAINT extras_details_pk PRIMARY KEY (History_ID, Client_ID, Order_ID, Order_Detail_ID, Dish_ID, Restaurant_ID, Chef_ID, Owner_ID, Recipe_ID, Ingredient_ID, Extra_ID)
+);
+
+
+ALTER SEQUENCE public.extras_detail_extra_id_seq OWNED BY public.Extras_Detail.Extra_ID;
+
+ALTER TABLE public.Owner ADD CONSTRAINT users_owner_fk
+FOREIGN KEY (User_ID)
+REFERENCES public.Users (User_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Chef ADD CONSTRAINT users_chef_fk
+FOREIGN KEY (User_ID)
+REFERENCES public.Users (User_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Client ADD CONSTRAINT users_client_fk
+FOREIGN KEY (User_ID)
+REFERENCES public.Users (User_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Preferences ADD CONSTRAINT client_preferences_fk
+FOREIGN KEY (User_ID, Client_ID)
+REFERENCES public.Client (User_ID, Client_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.History ADD CONSTRAINT client_history_fk
+FOREIGN KEY (User_ID, Client_ID)
+REFERENCES public.Client (User_ID, Client_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Orders ADD CONSTRAINT history_orders_fk
+FOREIGN KEY (History_ID, Client_ID)
+REFERENCES public.History (History_ID, Client_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Restaurant ADD CONSTRAINT chef_restaurant_fk
+FOREIGN KEY (User_ID, Chef_ID)
+REFERENCES public.Chef (User_ID, Chef_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Restaurant ADD CONSTRAINT owner_restaurant_fk
+FOREIGN KEY (User_ID, Owner_ID)
+REFERENCES public.Owner (User_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Dishes ADD CONSTRAINT restaurant_dishes_fk
+FOREIGN KEY (Restaurant_ID, Chef_ID, Owner_ID)
+REFERENCES public.Restaurant (Restaurant_ID, Chef_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Orders ADD CONSTRAINT restaurant_orders_fk
+FOREIGN KEY (Restaurant_ID, Chef_ID, Owner_ID)
+REFERENCES public.Restaurant (Restaurant_ID, Chef_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Order_Detail ADD CONSTRAINT orders_order_detail_fk
+FOREIGN KEY (History_ID, Order_ID, Chef_ID, Client_ID, Owner_ID)
+REFERENCES public.Orders (History_ID, Order_ID, Chef_ID, Client_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Recipe ADD CONSTRAINT ingredients_details_fk
+FOREIGN KEY (Ingredient_ID)
+REFERENCES public.Ingredients (Ingredient_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Extras_Detail ADD CONSTRAINT dishes_extras_detail_fk
+FOREIGN KEY (Dish_ID, Restaurant_ID, Chef_ID, Owner_ID)
+REFERENCES public.Dishes (Dish_ID, Restaurant_ID, Chef_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Recipe ADD CONSTRAINT dishes_details_fk
+FOREIGN KEY (Dish_ID, Restaurant_ID, Chef_ID, Owner_ID)
+REFERENCES public.Dishes (Dish_ID, Restaurant_ID, Chef_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Order_Detail ADD CONSTRAINT details_order_detail_fk
+FOREIGN KEY (Recipe_ID, Ingredient_ID, Restaurant_ID, Chef_ID, Owner_ID)
+REFERENCES public.Recipe (Recipe_ID, Ingredient_ID, Restaurant_ID, Chef_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;
+
+ALTER TABLE public.Extras_Detail ADD CONSTRAINT order_detail_extras_detail_fk
+FOREIGN KEY (History_ID, Order_ID, Order_Detail_ID, Recipe_ID, Ingredient_ID, Restaurant_ID, Chef_ID, Client_ID, Owner_ID)
+REFERENCES public.Order_Detail (History_ID, Order_ID, Order_Detail_ID, Recipe_ID, Ingredient_ID, Restaurant_ID, Chef_ID, Client_ID, Owner_ID)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+NOT DEFERRABLE;

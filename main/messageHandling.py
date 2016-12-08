@@ -30,13 +30,12 @@ def handle(msg):
 
     if (isinstance(analisys, str)):
         state = dbconnection.getUserState(id)
-        commands.identifyCommand(analisys, state[0], id, username, firstname, type, text)
+        commands.identifyCommand(analisys, state, id, username, firstname, type, text)
     elif(analisys == 1):
         state = dbconnection.getUserState(id)
-        # print("In message hanlder: " + str(state[0]))
-        command = commands.identifyCommandByState(state[0])
+        command = commands.identifyCommandByState(state)
         # print('Again in message handler: ' + command)
-        commands.identifyCommand(command, state[0], id, username, firstname, type, text)
+        commands.identifyCommand(command, state, id, username, firstname, type, text)
     elif(analisys == 0):
         state = dbconnection.getUserState(id)
         theBot.sendMessage(id, 'I can only understand you via commands. If you need help, send /help. It was nothing!')
@@ -46,14 +45,14 @@ def handle(msg):
 
 def analize(msg, text, id, type):
     state = dbconnection.getUserState(id)
-    if('entities' in msg and state[0] == 0):
+    if('entities' in msg and state == 'null'):
+        return '/start'
+    elif('entities' in msg and state == 0):
         textArray = text.split(" ")
         command = textArray[0]
         print('It\'s a command, and it says: ' + command + '\n')
         return command
-    elif('entities' in msg and state == 'null'):
-        return '/start'
-    elif('entities' in msg and state[0] != 0 and type != 'group'):
+    elif('entities' in msg and state != 0 and type != 'group'):
         textArray = text.split(" ")
         command = textArray[0]
         if (command == "/cancel"):
@@ -62,12 +61,15 @@ def analize(msg, text, id, type):
         else:
             return 1
     else:
-        if(type != 'group' and state[0] != 0):
+        if(type != 'group' and state != 0):
             print(1)
             return 1
-        elif(type != 'group' and state[0] == 0):
+        elif(type != 'group' and state == 0):
             print(0)
             return 0
 
 def sendMessage(id, text):
     theBot.sendMessage(id, text)
+
+def sendKeyboard(id, text, keyboard):
+    theBot.sendMessage(id, text, reply_markup=keyboard)
