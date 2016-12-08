@@ -62,6 +62,9 @@ def identifyCommandByState(state):
     elif (state >= 90 and state < 100):
         print('Identifying command, state is ' + str(state))
         return "/recommendation"
+    elif (state >= 100 and state < 110):
+        print('Identifying command, state is ' + str(state))
+        return "/managemenu"
 
 
 def identifyCommand(command, state, id, username, firstname, type, text):
@@ -97,6 +100,10 @@ def identifyCommand(command, state, id, username, firstname, type, text):
 
     elif (command == '/recommendation'):
         recommendation(state, id, username, firstname, text)
+
+    elif (command == '/managemenu'):
+        managemenu(state, id, username, firstname, type, text)
+
     elif (command == '/cancel' and state != 0):
         cancel(id)
     elif (command == '/cancel' and state == 0):
@@ -127,7 +134,7 @@ def start(id, username, firstname):
         print('User ' + firstname + '(ID: ' + str(id) + ', username: ' + username + ')' + ' is new, therefore has been added to the database')
 
 def help(id):
-    messageHandling.sendMessage(id, 'Command list:\n /newrestaurant --- Creates a new Restaurant \n/changechef --- Manage the chef of your restaurant \n/restdescription --- Set a description for your restaurant \n/editmenu --- Create or update your restaurant’s menu \n/editrecipe --- Creates or edit a recipe for your menu \n/dishdescription --- Set a description for your dish \n /neworder --- Order the dish you want from any of the available restaurants')
+    messageHandling.sendMessage(id, 'Command list:\n /newrestaurant --- Creates a new Restaurant \n/changechef --- Manage the chef of your restaurant \n/restdescription --- Set a description for your restaurant \n/editmenu --- Create or update your restaurant’s menu \n/editrecipe --- Creates or edit a recipe for your menu \n/dishdescription --- Set a description for your dish\n/managemenu --- Choose if dish appears in menu\n /neworder --- Order the dish you want from any of the available restaurants')
 
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
@@ -275,7 +282,7 @@ def EditRecipe(state, id, username, firstname, type):
         messageHandling.sendMessage(id, "hahaha you're now trapped in EditRecipe function, on state 52! No matter what you do, you can't leave this place")
 
 
-def DishDescription(state, id, username, firstname, type):
+def DishDescription(state, id, username, firstname, type, text):
     if (state == 0):
         restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
         if(restaurants == "null"):
@@ -309,6 +316,49 @@ def DishDescription(state, id, username, firstname, type):
            dbconnection.executeQuery("UPDATE dishes SET dish_description= %s WHERE dish_name= %s AND restaurant_id= %s", [dishDescription, dishName, restID[0]], False)
            messageHandling.sendMessage(id, "The description of " + dishName + "has been changed")
            dbconnection.saveUserState(id, 0)
+
+def managemenu(state, id, username, firstname, type, text):
+    if (state == 0):
+        restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
+        if(restaurants == "null"):
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /newrestaurant")
+            dbconnection.saveUserState(id,0)
+        else:
+            arr = objectList(restaurants)
+            messageHandling.sendKeyboard(id, "Select the restaurant to add a Menu", {"keyboard": [arr], "one_time_keyboard":True})
+            dbconnection.saveUserState(id, 101)
+    if (state == 101):
+        global restaurantName
+        restaurantName = text
+        global restID
+        restID = dbconnection.executeQuery("SELECT restaurant_id FROM restaurant WHERE restaurant_name= %s", [restaurantName], True)             #revisar
+        print(restID)
+        dishes = dbconnection.executeQuery("SELECT dish_name FROM dishes WHERE restaurant_id= %s", [restID[0]], True)
+        if(dishes == "null"):
+            messageHandling.sendMessage(id, "The restaurant "+ restaurantName + " dosen't have a Menu, to create one use the comand /editmenu")
+            dbconnection.saveUserState(id, 0)
+        else:
+            arr = objectList(dishes)
+            messageHandling.sendKeyboard(id, "Choose the dish to add/change a description", {"keyboard": [arr], "one_time_keyboard":True})
+            dbconnection.saveUserState(id, 102)
+    if (state == 102):
+        global dishName
+        dishName = text
+        messageHandling.sendKeyboard(id, "If you want the dish on the menu press 'Add' or 'remove' if you don't want it ", {"keyboard": [["Add", "Remove"]], "one_time_keyboard":True})
+        dbconnection.saveUserState(id, 103)
+    if(state == 103):
+        dishState = text
+        if(dishState == "Add"):
+            dishState = True
+            dbconnection.executeQuery("UPDATE dishes SET on_menu= %s WHERE dish_name= %s AND restaurant_id= %s", [dishState, dishName, restID[0]], False)
+            messageHandling.sendMessage(id, dishName + " was add to the menu")
+            dbconnection.saveUserState(id, 0)
+        else:
+            dishState = False
+            dbconnection.executeQuery("UPDATE dishes SET on_menu= %s WHERE dish_name= %s AND restaurant_id= %s", [dishState, dishName, restID[0]], False)
+            messageHandling.sendMessage(id, dishName + " was remove to the menu")
+            dbconnection.saveUserState(id, 0)
+
 
 def NewOrder(state, id, username, firstname, type, text):
     if (state == 0):
