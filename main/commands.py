@@ -11,20 +11,13 @@ restaurantName = "null"
 restaurantCategory = "null"
 restaurantDescription = "null"
 restaurantAddress = "null"
+dishName = "null"
+restID = "null"
+dishPrice = "null"
 userID = "null"
 
-# def addOrDelete(responds):
-#     if(responds == "add"):
-#         messageHandling.sendMessage(id,"Write the new dish's name")
-#         dishName = text
-#         executeQuery("INSERT INTO dishes (user_id, user_name, user_firstname)", [text], False)
-#         return responds = "If you want to add or delete other dish use again 'add' or 'delete'"
-#     elif(responds == "delete"):
-#         messageHandling.sendMessage(id,"what dish do you want to delete?")
-#         executeQuery("DELETE ", [text], False)
-#         return responds = "If you want to add or delete other dish use again 'add' or 'delete'"
 
-def restaurantList(listR):
+def objectList(listR):
     arr = []
     for list in listR:
         for x in list:
@@ -55,7 +48,7 @@ def identifyCommandByState(state):
         return "/neworder"
     elif (state >= 80 and state < 90):
         print('Identifying command, state is ' + str(state))
-        return "/RestAddress"
+        return "/restaddress"
     elif (state >= 90 and state < 100):
         print('Identifying command, state is ' + str(state))
         return "/recommendation"
@@ -78,7 +71,7 @@ def identifyCommand(command, state, id, username, firstname, type, text):
         RestDescription(state, id, username, firstname, type, text)
 
     elif (command == '/restaddress'):
-        RestDescription(state, id, username, firstname, type, text)
+        RestAddress(state, id, username, firstname, type, text)
 
     elif (command == '/editmenu'):
         EditMenu(state, id, username, firstname, type, text)
@@ -96,6 +89,7 @@ def identifyCommand(command, state, id, username, firstname, type, text):
         recommendation(state, id, username, firstname, text)
     elif (command == '/cancel' and state != 0):
         cancel(id)
+
     elif (command == '/cancel' and state == 0):
         messageHandling.sendMessage(id, "...Ok? I wasn't doing anything anyway .-.")
     else:
@@ -124,7 +118,7 @@ def start(id, username, firstname):
         print('User ' + firstname + '(ID: ' + str(id) + ', username: ' + username + ')' + ' is new, therefore has been added to the database')
 
 def help(id):
-    messageHandling.sendMessage(id, 'Command list:\n /newrestaurant --- Creates a new Restaurant \n/changechef --- Manage the chef of your restaurant \n/restdescription --- Set a description for your restaurant \n/editmenu --- Create or update your restaurant’s menu \n/editrecipe --- Creates or edit a recipe for your menu \n/dishdescription --- Set a description for your dish \n /neworder --- Order the dish you want from any of the available restaurants')
+    messageHandling.sendMessage(id, 'Command list:\n /newrestaurant --- Creates a new Restaurant \n/changechef --- Manage the chef of your restaurant \n/restdescription --- Set a description for your restaurant \n/RestAddress --- Set an address for your restaurant\n/editmenu --- Create or update your restaurant’s menu \n/editrecipe --- Creates or edit a recipe for your menu \n/dishdescription --- Set a description for your dish \n /neworder --- Order the dish you want from any of the available restaurants')
 
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
@@ -207,7 +201,7 @@ def RestDescription(state, id, username, firstname, type, text):
             messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /newrestaurant")
             dbconnection.saveUserState(id,0)
         else:
-            arr = restaurantList(restaurants)
+            arr = objectList(restaurants)
             messageHandling.sendKeyboard(id, "Select the restaurant to add a description ", {"keyboard": [arr], "one_time_keyboard":True})
             dbconnection.saveUserState(id,31)
     if (state == 31):
@@ -221,15 +215,16 @@ def RestDescription(state, id, username, firstname, type, text):
         dbconnection.executeQuery("UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s", [restaurantDescription, restaurantName], False)
         messageHandling.sendMessage(id, "The description of " + restaurantName + " has been changed")
         dbconnection.saveUserState(id, 0)
+        print(getUserState(id))
 
-def RestAddress(state, id, username, firstname, type, text):
+def restaddress(state, id, username, firstname, type, text):
     if (state == 0):
         restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
         if (restaurants == "null"):
             messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
             dbconnection.saveUserState(id,0)
         else:
-            arr = restaurantList(restaurants)
+            arr = objectList(restaurants)
             messageHandling.sendKeyboard(id, "Select the restaurant to add an address ", {"keyboard": [arr], "one_time_keyboard":True})
             dbconnection.saveUserState(id,81)
     if (state == 81):
@@ -240,49 +235,74 @@ def RestAddress(state, id, username, firstname, type, text):
     if (state == 82):
         global restaurantAddress
         restaurantAddress = text
-        dbconnection.executeQuery("UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s", [restaurantAddress, restaurantName], False)
-        messageHandling.sendMessage(id, "The description of " + restaurantName + " has been changed")
+        dbconnection.executeQuery("UPDATE restaurant SET restaurant_address= %s WHERE restaurant_name = %s", [restaurantAddress, restaurantName], False)
+        messageHandling.sendMessage(id, "The address of " + restaurantName + " has been changed")
         dbconnection.saveUserState(id, 0)
 
-def EditMenu(state, id, username, firstname, type):
-    print("algo")
-    # if (state == 0):
-    #     restaurants = executeQuery("SELECT restaurant_name FROM restaurant WHERE owner_id = %s", [id], True)
-    #     if(restaurants == "null"):
-    #         messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
-    #         dbconnection.saveUserState(id,0)
-    #     else:
-    #         arr = restaurantList(restaurants)
-    #         messageHandling.sendKeyboard(id, "Select the restaurant to add a Menu", {"keyboard": [[arr]], "one_time_keyboard":True})
-    #         dbconnection.saveUserState(id,41)
-    #         if (state == 41):
-    #             global restaurantName
-    #             restaurant = text               #revisar
-    #             dishes = executeQuery("SELECT *from dishes where restaurant_id= %s", [restaurants], True)
-    #             if(dishes == "null"):
-    #                 messageHandling.sendMessage(id, "The restaurant "+ restaurantName+ "dosen't have a Menu, to create it send 'add'")
-    #                 dbconnection.saveUserState(id, 42)
-    #                 if(state == 42):
-    #                     while(text == "add" || text == "delete"):
-    #                         x = addOrDelete(text)
-    #                         messageHandling(x)
-                #
-                #
-                #
-                #
-                # else:
-                #     messageHandling.sendMessage(id, "If you want to add or delete a dishes use 'add' or 'delete'")
-                #     if
-                #
-                #
-                # messageHandling.sendMessage(id, "Type your restaurant description (max 400 characters)")
-                # dbconnection.saveUserState(id,42)
+    # query0 = "UPDATE restaurant (restaurant_description) VALUES (%s) WHERE owner_id = %s"
+    # data0 = (restaurantDescription, id)
+    # cursor.execute(query0, data0)
+    # conn.commit()
+    # messageHandling.sendMessage(id,'“The description of (restaurant_name) has been changed”')
 
-
-
-
-
-
+def EditMenu(state, id, username, firstname, type, text):
+    if (state == 0):
+        restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
+        if(restaurants == "null"):
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
+            dbconnection.saveUserState(id,0)
+        else:
+            arr = objectList(restaurants)
+            messageHandling.sendKeyboard(id, "Select the restaurant to add a Menu", {"keyboard": [arr], "one_time_keyboard":True})
+            dbconnection.saveUserState(id,41)
+    if (state == 41):
+            global restaurantName
+            restaurantName = text
+            restID = dbconnection.executeQuery("SELECT restaurant_id FROM restaurant WHERE restaurant_name= %s", [restaurantName], True)             #revisar
+            print(restID)
+            dishes = dbconnection.executeQuery("SELECT dish_name FROM dishes WHERE restaurant_id= %s", [restID[0]], True)
+            if(dishes == "null"):
+                messageHandling.sendKeyboard(id, "The restaurant "+ restaurantName + " dosen't have a Menu, to create it send 'add'", {"keyboard": [["Add"], ["Cancel"]], "one_time_keyboard":True})
+                dbconnection.saveUserState(id, 42)
+            else:
+                messageHandling.sendKeyboard(id, "If you want to add or delete a dishes use 'add' or 'delete'", {"keyboard": [["Add", "Delete"], ["Cancel"]], "one_time_keyboard":True})
+                dbconnection.saveUserState(id, 42)
+    if(state == 42):
+        if(text == "Add"):
+            messageHandling.sendMessage(id,"Write the new dish's name")
+            dbconnection.saveUserState(id, 43)
+        elif(text == "Delete"):
+            messageHandling.sendMessage(id,"what dish do you want to delete?") #crear un customkye
+            dbconnection.saveUserState(id, 46)
+        elif(text == "Cancel"):
+            messageHandling.sendMessage(id, "Comand has been canceled")
+            dbconnection.saveUserState(id, 0)
+    if(state == 43):
+        global dishName
+        dishName = text
+        messageHandling.sendMessage(id, "Price of the dish")
+        dbconnection.saveUserState(id, 44)
+    if(state == 44):
+        global dishPrice
+        dishPrice = text
+        messageHandling.sendMessage(id, "Type the description to "+ dishName)
+        dbconnection.saveUserState(id, 45)
+    if(state == 45):
+        dishDescription = text
+        data = dbconnection.executeQuery("SELECT chef_id, owner_id, restaurant_id, restaurant_category FROM restaurant WHERE restaurant_name= %s AND user_id= %s", [ restaurantName, id], True)
+        arr = objectList(data)
+        dbconnection.executeQuery("INSERT INTO dishes (chef_id, owner_id, restaurant_id, dish_name, dish_category, dish_price, dish_description, dish_demand ) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", [arr[0], arr[1], arr[2], dishName,  arr[3], dishPrice, dishDescription, "1"], False)
+        dbconnection.saveUserState(id, 47)
+    if(state == 46):
+        dishName = text
+        dbconnection.executeQuery("DELETE FROM dishes WHERE dish_name=%s AND restaurant_id= %s ", [dishName, restID[0]], False)
+        dbconnection.saveUserState(id, 47)
+    if(state == 47):
+        messageHandling.sendKeyboard(id, "If you want to add or delete another dish use 'add' or 'delete'", {"keyboard": [["Add", "Delete"], ["Cancel"]], "one_time_keyboard":True})
+        if(text == "Add" or text == "Delete"):
+            dbconnection.saveUserState(id, 42)
+        else:
+            dbconnection.saveUserState(id, 0)
 
 
 
@@ -297,33 +317,40 @@ def EditRecipe(state, id, username, firstname, type):
         messageHandling.sendMessage(id, "hahaha you're now trapped in EditRecipe function, on state 52! No matter what you do, you can't leave this place")
 
 
-def DishDescription(state, id, username, firstname, type):
-    print("algo")
-    #  if (state == 0):
-    #      restaurants = executeQuery("SELECT restaurant_name FROM restaurant WHERE owner_id = %s", [id], True)
-    #      if(restaurants == "null"):
-    #          messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
-    #          dbconnection.saveUserState(id,0)
-    #      else:
-    #          messageHandling.sendMessage(id, "Select the restaurant of the dish which description you want to change/create" + restaurants)
-    #          dbconnection.saveUserState(id,61)
-    #          if (state == 61):
-    #              global restaurantName
-    #              restaurantName = text               #revisar
-    #              dishes = executeQuery("SELECT dish_name from dishes where restaurant_name= %s", [restaurantName], True)
-    #              if(dishes == "null"):
-    #                  messageHandling.sendMessage(id, "The restaurant "+ restaurantName + "doesn't have a Menu, to create it use the comand /EditMenu")
-    #                  dbconnection.saveUserState(id, 62)
-    #              else:
-    #                  messageHandling.sendMessage(id, "Choose the dish to add a description")
-    #                  dishName = text
-    #                  dishName2 = executeQuery("SELECT dish_name FROM dishes where dish_name= %s AND owner_id= %s", [dishName, id],True)
-    #                  if(dishName2 == null):
-    #                      messageHandling.sendMessage(id, "There are no dish with that name")
-    #                  else:
-    #                      messageHandling.sendMessage(id, "Type the description of " + dishName2 + "(Max characters 400)")
-    #                      dishDescription = text
-    #                      executeQuery("UPDATE dishes SET dish_description= %s WHERE dish_name= %s & user_id= %s ", [dishDescription, dishName2, id],False)
+def DishDescription(state, id, username, firstname, type, text):
+    if (state == 0):
+        restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
+        if(restaurants == "null"):
+            messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /NewRestaurant")
+            dbconnection.saveUserState(id,0)
+        else:
+            arr = objectList(restaurants)
+            messageHandling.sendKeyboard(id, "Select the restaurant to add a Menu", {"keyboard": [arr], "one_time_keyboard":True})
+            dbconnection.saveUserState(id,61)
+    if (state == 61):
+            global restaurantName
+            restaurantName = text
+            global restID
+            restID = dbconnection.executeQuery("SELECT restaurant_id FROM restaurant WHERE restaurant_name= %s", [restaurantName], True)             #revisar
+            print(restID)
+            dishes = dbconnection.executeQuery("SELECT dish_name FROM dishes WHERE restaurant_id= %s", [restID[0]], True)
+            if(dishes == "null"):
+                messageHandling.sendMessage(id, "The restaurant "+ restaurantName + " dosen't have a Menu, to create one use the comand /editmenu")
+                dbconnection.saveUserState(id, 0)
+            else:
+                arr = objectList(dishes)
+                messageHandling.sendKeyboard(id, "Choose the dish to add a description", {"keyboard": [arr], "one_time_keyboard":True})
+                dbconnection.saveUserState(id, 62)
+    if (state == 62):
+           global dishName
+           dishName = text
+           messageHandling.sendMessage(id, "Type the description to "+ dishName)
+           dbconnection.saveUserState(id, 63)
+    if (state == 63):
+           dishDescription = text
+           dbconnection.executeQuery("UPDATE dishes SET dish_description= %s WHERE dish_name= %s AND restaurant_id= %s", [dishDescription, dishName, restID[0]], False)
+           messageHandling.sendMessage(id, "The description of " + dishName + "has been changed")
+           dbconnection.saveUserState(id, 0)
 
 
 def NewOrder(state, id, username, firstname, type, text):
