@@ -56,6 +56,9 @@ def identifyCommandByState(state):
     elif (state >= 80 and state < 90):
         print('Identifying command, state is ' + str(state))
         return "/RestAddress"
+    elif (state >= 90 and state < 100):
+        print('Identifying command, state is ' + str(state))
+        return "/recommendation"
 
 
 def identifyCommand(command, state, id, username, firstname, type, text):
@@ -89,6 +92,8 @@ def identifyCommand(command, state, id, username, firstname, type, text):
     elif (command == '/neworder'):
         NewOrder(state, id, username, firstname, type, text)
 
+    elif (command == '/recommendation'):
+        recommendation(state, id, username, firstname, text)
     elif (command == '/cancel' and state != 0):
         cancel(id)
     elif (command == '/cancel' and state == 0):
@@ -321,7 +326,7 @@ def DishDescription(state, id, username, firstname, type):
     #                      executeQuery("UPDATE dishes SET dish_description= %s WHERE dish_name= %s & user_id= %s ", [dishDescription, dishName2, id],False)
 
 
-def NewOrder(state, id, username, firstname, type):
+def NewOrder(state, id, username, firstname, type, text):
     if (state == 0):
         messageHandling.sendMessage(id, "You're inside NewOrder function, on state 70, please send me another message to get out of here")
         dbconnection.saveUserState(id, 71)
@@ -330,6 +335,12 @@ def NewOrder(state, id, username, firstname, type):
         dbconnection.saveUserState(id, 72)
     if (state == 72):
         messageHandling.sendMessage(id, "hahaha you're now trapped in NewOrder function, on state 72! No matter what you do, you can't leave this place")
+
+def recommendation(state, id, username, firstname, text):
+    if (state = 0):
+        isChef = dbconnection.executeQuery('SELECT * FROM chef WHERE user_id=%s', [id], True)
+        if (isChef != 'null'):
+            messageHandling.sendMessage(id, "You're not a chef, if you wanna join the club, create a new restaurant! use /newrestaurant")
 
 def cancel(id):
     dbconnection.saveUserState(id, 0)
