@@ -75,7 +75,7 @@ def identifyCommand(command, state, id, username, firstname, type, text):
         RestDescription(state, id, username, firstname, type, text)
 
     elif (command == '/RestAddress'):
-        RestDescription(state, id, username, firstname, type, text)
+        RestAddress(state, id, username, firstname, type, text)
 
     elif (command == '/EditMenu'):
         EditMenu(state, id, username, firstname, type, text)
@@ -119,7 +119,7 @@ def start(id, username, firstname):
         print('User ' + firstname + '(ID: ' + str(id) + ', username: ' + username + ')' + ' is new, therefore has been added to the database')
 
 def help(id):
-    messageHandling.sendMessage(id, 'Command list:\n /NewRestaurant --- Creates a new Restaurant \n/ChangeChef --- Manage the chef of your restaurant \n/RestDescription --- Set a description for your restaurant \n/EditMenu --- Create or update your restaurant’s menu \n/EditRecipe --- Creates or edit a recipe for your menu \n/DishDescription --- Set a description for your dish \n /NewOrder --- Order the dish you want from any of the available restaurants')
+    messageHandling.sendMessage(id, 'Command list:\n /NewRestaurant --- Creates a new Restaurant \n/ChangeChef --- Manage the chef of your restaurant \n/RestDescription --- Set a description for your restaurant \n/RestAddress --- Set an address for your restaurant\n/EditMenu --- Create or update your restaurant’s menu \n/EditRecipe --- Creates or edit a recipe for your menu \n/DishDescription --- Set a description for your dish \n /NewOrder --- Order the dish you want from any of the available restaurants')
 
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
@@ -216,8 +216,9 @@ def RestDescription(state, id, username, firstname, type, text):
         dbconnection.executeQuery("UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s", [restaurantDescription, restaurantName], False)
         messageHandling.sendMessage(id, "The description of " + restaurantName + " has been changed")
         dbconnection.saveUserState(id, 0)
+        print(getUserState(id))
 
-def RestAddress(state, id, username, firstname, type, text):
+def restaddress(state, id, username, firstname, type, text):
     if (state == 0):
         restaurants = dbconnection.executeQuery("SELECT restaurant_name FROM restaurant WHERE user_id = %s", [id], True)
         if (restaurants == "null"):
@@ -235,8 +236,8 @@ def RestAddress(state, id, username, firstname, type, text):
     if (state == 82):
         global restaurantAddress
         restaurantAddress = text
-        dbconnection.executeQuery("UPDATE restaurant SET restaurant_description= %s WHERE restaurant_name = %s", [restaurantAddress, restaurantName], False)
-        messageHandling.sendMessage(id, "The description of " + restaurantName + " has been changed")
+        dbconnection.executeQuery("UPDATE restaurant SET restaurant_address= %s WHERE restaurant_name = %s", [restaurantAddress, restaurantName], False)
+        messageHandling.sendMessage(id, "The address of " + restaurantName + " has been changed")
         dbconnection.saveUserState(id, 0)
 
     # query0 = "UPDATE restaurant (restaurant_description) VALUES (%s) WHERE owner_id = %s"
