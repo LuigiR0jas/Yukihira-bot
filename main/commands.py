@@ -34,25 +34,25 @@ def restaurantList(listR):
 def identifyCommandByState(state):
     if (state >= 10 and state < 20):
         print('Identifying command, state is ' + str(state))
-        return "/NewRestaurant"
+        return "/newrestaurant"
     elif (state >= 20 and state < 30):
         print('Identifying command, state is ' + str(state))
-        return "/ChangeChef"
+        return "/changechef"
     elif (state >= 30 and state < 40):
         print('Identifying command, state is ' + str(state))
-        return "/RestDescription"
+        return "/restdescription"
     elif (state >= 40 and state < 50):
         print('Identifying command, state is ' + str(state))
-        return "/EditMenu"
+        return "/editmenu"
     elif (state >= 50 and state < 60):
         print('Identifying command, state is ' + str(state))
-        return "/EditRecipe"
+        return "/editrecipe"
     elif (state >= 60 and state < 70):
         print('Identifying command, state is ' + str(state))
-        return "/DishDescription"
+        return "/dishdescription"
     elif (state >= 70 and state < 80):
         print('Identifying command, state is ' + str(state))
-        return "/NewOrder"
+        return "/neworder"
     elif (state >= 80 and state < 90):
         print('Identifying command, state is ' + str(state))
         return "/RestAddress"
@@ -65,28 +65,28 @@ def identifyCommand(command, state, id, username, firstname, type, text):
     elif (command == '/help'):
         help(id)
 
-    elif (command == '/NewRestaurant'):
+    elif (command == '/newrestaurant'):
         NewRestaurant(state, id, username, firstname, type, text)
 
-    elif (command == '/ChangeChef'):
+    elif (command == '/changechef'):
         ChangeChef(state, id, username, firstname, type, text)
 
-    elif (command == '/RestDescription'):
+    elif (command == '/restdescription'):
         RestDescription(state, id, username, firstname, type, text)
 
     elif (command == '/RestAddress'):
         RestAddress(state, id, username, firstname, type, text)
 
-    elif (command == '/EditMenu'):
+    elif (command == '/editmenu'):
         EditMenu(state, id, username, firstname, type, text)
 
-    elif (command == '/EditRecipe'):
+    elif (command == '/editrecipe'):
         EditRecipe(state, id, username, firstname, type, text)
 
-    elif (command == '/DishDescription'):
+    elif (command == '/dishdescription'):
         DishDescription(state, id, username, firstname, type, text)
 
-    elif (command == '/NewOrder'):
+    elif (command == '/neworder'):
         NewOrder(state, id, username, firstname, type, text)
 
     elif (command == '/cancel' and state != 0):
@@ -119,7 +119,11 @@ def start(id, username, firstname):
         print('User ' + firstname + '(ID: ' + str(id) + ', username: ' + username + ')' + ' is new, therefore has been added to the database')
 
 def help(id):
+<<<<<<< HEAD
     messageHandling.sendMessage(id, 'Command list:\n /NewRestaurant --- Creates a new Restaurant \n/ChangeChef --- Manage the chef of your restaurant \n/RestDescription --- Set a description for your restaurant \n/RestAddress --- Set an address for your restaurant\n/EditMenu --- Create or update your restaurant’s menu \n/EditRecipe --- Creates or edit a recipe for your menu \n/DishDescription --- Set a description for your dish \n /NewOrder --- Order the dish you want from any of the available restaurants')
+=======
+    messageHandling.sendMessage(id, 'Command list:\n /newrestaurant --- Creates a new Restaurant \n/changechef --- Manage the chef of your restaurant \n/restdescription --- Set a description for your restaurant \n/editmenu --- Create or update your restaurant’s menu \n/editrecipe --- Creates or edit a recipe for your menu \n/dishdescription --- Set a description for your dish \n /neworder --- Order the dish you want from any of the available restaurants')
+>>>>>>> 0856e674b4230d2aa2558a6e4bb25e8c07e0fa1e
 
 def NewRestaurant(state, id, username, firstname, type, text):
     if (state == 0):
@@ -149,7 +153,7 @@ def NewRestaurant(state, id, username, firstname, type, text):
             chefID = dbconnection.executeQuery("SELECT chef_id FROM chef WHERE user_id=%s", [id], True)
 
         dbconnection.executeQuery("INSERT INTO restaurant (chef_id, user_id, owner_id, restaurant_name, restaurant_category) VALUES (%s, %s, %s, %s, %s)", (chefID[0], id, ownerID[0], restaurantName, restaurantCategory), False)
-        messageHandling.sendMessage(id, 'Congratulations ' + username + ', you are the new owner and main chef of ' + restaurantName + '. If you want to create the menu for your restaurant, use the /EditMenu command, and if you are not the Chef of the restaurant type /ChangeChef to assign a new one')
+        messageHandling.sendMessage(id, 'Congratulations ' + username + ', you are the new owner and main chef of ' + restaurantName + '. If you want to create the menu for your restaurant, use the /editmenu command, and if you are not the Chef of the restaurant type /changechef to assign a new one')
         dbconnection.saveUserState(id, 0)
 
 def ChangeChef(state, id, username, firstname, type):
