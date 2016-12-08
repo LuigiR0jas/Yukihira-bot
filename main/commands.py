@@ -5,6 +5,8 @@ import config
 import dbconnection
 import random
 import messageHandling
+import operator
+import numpy
 
 TOKEN = config.apiKey
 restaurantName = "null"
@@ -22,6 +24,7 @@ quantity = "null"
 ingredientName = "null"
 ingredient = "null"
 unit = "null"
+dishesC = "null"
 
 
 def objectList(listR):
@@ -172,7 +175,7 @@ def RestDescription(state, id, username, firstname, type, text):
             messageHandling.sendMessage(id, "You don't have any restaurant. To create one use the comand /newrestaurant")
             dbconnection.saveUserState(id,0)
         else:
-            arr = restaurantList(restaurants)
+            arr = objectList(restaurants)
             messageHandling.sendKeyboard(id, "Select the restaurant to add a description ", {"keyboard": [arr], "one_time_keyboard":True})
             dbconnection.saveUserState(id,31)
     if (state == 31):
@@ -440,27 +443,34 @@ def NewOrder(state, id, username, firstname, type, text):
         print(restID)
         global dishesC
         dishesC = dbconnection.executeQuery("SELECT dish_name FROM dishes WHERE restaurant_id= %s", [restID[0]], True)
-        if(dishes == "null"):
+        if(dishesC == "null"):
             messageHandling.sendMessage(id, "The restaurant "+ restaurantName + " doesn't have a Menu yet")
             dbconnection.saveUserState(id, 0)
         else:
             dbconnection.saveUserState(id, 72)
+            identifyCommand("/neworder", 72, id, username, firstname, type, restaurantName)
     if (state == 72):
         arr = objectList(dishesC)
         messageHandling.sendKeyboard(id, "Choose the dish you want to order", {"keyboard": [arr], "one_time_keyboard":True})
+        dbconnection.saveUserState(id, 73)
+    if (state == 73):
         global dishName
         dishName = text
-        dishDemand = dbconnection.executeQuery("SELECT dish_demand FROM dishes WHERE dish_name= %s AND restaurant_id= %s", [ dishName, restID[0]], False)
+        dishDemand = dbconnection.executeQuery("SELECT dish_demand FROM dishes WHERE dish_name= %s AND restaurant_id= %s", [dishName, restID[0]], True)
+        print(dishDemand)
         dishDemand1 = objectList(dishDemand)
-        dishDemand1[0] = dishDemand1[0] + 1
-        dbconnection.executeQuery("UPDATE dishes SET dish_demand= %s WHERE dish_name= %s AND restaurant_id= %s", [dishDemand1[0], dishName, restID[0]], False)
-        messageHandling.sendKeyboard(id, "If you want other dish press 'other dish' if you don't want order more press 'Finish order'", {"keyboard": [["Other dish", "Finish order"]], "one_time_keyboard":True})
-        dbconnection.saveUserState(id, 73)
+        demand = (1,)
+        final = tuple(numpy.add(dishDemand1, demand))
+        finall = tuple(final)
+        print(final)
+        dbconnection.executeQuery("UPDATE dishes SET dish_demand= %s WHERE dish_name= %s AND restaurant_id= %s", [finall[0], dishName, restID[0]], False)
+        messageHandling.sendKeyboard(id, dishName + " was ordered if you want other dish press 'other dish' if you don't want order more press 'Finish order'", {"keyboard": [["Other dish", "Finish order"]], "one_time_keyboard":True})
+        dbconnection.saveUserState(id, 74)
     if(state == 74):
         dishOrder = text
         if(dishOrder == "Other dish"):
-            messageHandling.sendMessage(id, dishName + " was other")
             dbconnection.saveUserState(id, 72)
+            identifyCommand("/neworder", 72, id, username, firstname, type, restaurantName)
         else:
             messageHandling.sendMessage(id, "you finished your order")
             dbconnection.saveUserState(id, 0)
